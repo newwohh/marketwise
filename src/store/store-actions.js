@@ -7,12 +7,12 @@ export const getCryptoNews = createAsyncThunk(
   "store/getCryptoNews",
   async () => {
     const url =
-      "https://newsdata.io/api/1/news?apikey=REDACTED_CONFIGURE_LOCALLY&q=cryptocurrency ";
+      "https://newsdata.io/api/1/news?apikey=REDACTED_CONFIGURE_LOCALLY&q=cryptocurrency";
 
     try {
       const response = await fetch(url);
       const result = await response.json();
-      // console.log(result.results);
+      console.log(result.results);
       return result;
     } catch (error) {
       console.error(error);
@@ -65,7 +65,7 @@ export const getStockPrice = createAsyncThunk(
           return stockPriceResult;
         })
       );
-      console.log(results);
+      // console.log(results);
       return results;
     } catch (error) {
       console.log(error);
