@@ -14,6 +14,17 @@ dotenv.config({ path: "./config/config.env" });
 
 // body parser, reading data from body into req.body
 app.use(express.json({ limit: "10kb" }));
+app.use((req, res, next) => {
+  // Existing sanitizers assign req.query, which is a getter in Express 5.
+  Object.defineProperty(req, "query", {
+    value: req.query,
+    writable: true,
+    configurable: true,
+    enumerable: true,
+  });
+  req.body ??= {};
+  next();
+});
 // data sanitization against noSQL query injection
 app.use(mongoSanitize());
 // data sanitization against cross side scripting
@@ -22,7 +33,9 @@ app.use(xss());
 // Cross side scripting middleware
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Credentials", true);
-  res.header("Access-Control-Allow-Origin", req.headers.origin);
+  if (req.headers.origin) {
+    res.header("Access-Control-Allow-Origin", req.headers.origin);
+  }
   res.header(
     "Access-Control-Allow-Headers",
     "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept"
