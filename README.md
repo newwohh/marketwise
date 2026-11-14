@@ -7,7 +7,9 @@ old application are copied into this project.
 
 ## Current implementation
 
-- Responsive marketing page with original content and artwork.
+- Responsive marketing page with original content and a lazy-loaded reflective
+  3D lilac sculpture, pause control, pointer response, offscreen suspension, and
+  static fallback for reduced motion or unavailable WebGL.
 - Market workspace with search, sorting, browser-persisted watchlists, asset
   detail dialogs, seven-day charts, and heatmap view.
 - CoinGecko cryptocurrency adapter, server-side validation, bounded requests,
@@ -18,15 +20,19 @@ old application are copied into this project.
   connected. No sample price is presented as a current price.
 - Investment simulator using an effective annual return converted to a monthly
   rate, with end-of-month contributions. Supports zero and negative returns.
+- Restored legacy public routes, TradingView technical charts, publisher news,
+  guided help, academy read-aloud, informational pages, and local blog drafts.
+  See `FEATURE_PARITY.md` for the complete audit and remaining gaps.
 - Original learning articles, SEO metadata, robots, sitemap, health endpoint,
   security headers, CI, and weekly dependency-update proposals.
 
 ## Incomplete — do not call this production-ready
 
 The account, cloud-watchlist, subscription, and Pro-export flows are not yet
-implemented or provisioned. Navigation to `/account` and `/pricing` and the Pro
-export action are reserved for this next phase; they are not acceptance-tested
-features. The public marketing copy describes the intended complete product.
+implemented or provisioned. `/account` and `/pricing` now explain availability
+accurately; they do not implement authentication or checkout. Pro export returns
+an explicit unavailable response. Public blog publishing and old account/data
+migration are also pending. Local notebook drafts are not public posts.
 Do not release this branch as a completed product until those flows are ready.
 
 Vercel project access is now authorized. The `marketwise` project and its first

@@ -1,7 +1,7 @@
 // Shared market contracts and pure calculations; demo quotes never masquerade as live prices.
 export type Market = "crypto" | "stocks" | "forex";
 export type Quote = {
-  id: string; symbol: string; name: string; price: number; change: number | null;
+  id: string; symbol: string; name: string; price: number; change: number | null; change7d?: number | null;
   marketCap: number | null; volume: number | null; history: number[]; color: string;
 };
 export type MarketData = {
