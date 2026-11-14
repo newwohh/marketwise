@@ -8,8 +8,27 @@ const calendarDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(value => {
   const date = new Date(`${value}T00:00:00Z`);
   return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
 });
+const stockQuote = z.object({ c: z.number().positive(), dp: z.number().nullable(), t: z.number().int().positive() });
+async function getStocks(request: typeof fetch): Promise<MarketData> {
+  const key = process.env.FINNHUB_API_KEY;
+  if (!key) return demoData("stocks");
+  const assets = [{ symbol: "AAPL", name: "Apple" }, { symbol: "MSFT", name: "Microsoft" }, { symbol: "NVDA", name: "NVIDIA" }, { symbol: "GOOGL", name: "Alphabet" }, { symbol: "AMZN", name: "Amazon" }, { symbol: "TSLA", name: "Tesla" }];
+  const rows = await Promise.all(assets.map(async (asset, index) => {
+    try {
+      const response = await request(`https://finnhub.io/api/v1/quote?symbol=${asset.symbol}`, { headers: { "X-Finnhub-Token": key }, next: { revalidate: 300 }, signal: AbortSignal.timeout(8000) });
+      if (!response.ok) return null;
+      const quote = stockQuote.parse(await response.json());
+      const timestamp = new Date(quote.t * 1000);
+      if (!Number.isFinite(timestamp.getTime())) return null;
+      return { timestamp: timestamp.toISOString(), quote: { id: asset.symbol.toLowerCase(), ...asset, price: quote.c, change: quote.dp, change7d: null, marketCap: null, volume: null, history: [], color: colors[index % colors.length] } };
+    } catch { return null; }
+  }));
+  const available = rows.filter(row => row !== null);
+  if (!available.length) return demoData("stocks");
+  return { quotes: available.map(row => row.quote), mode: "live", source: "Finnhub", asOf: available.map(row => row.timestamp).sort()[0], note: `Provider stock quotes, cached for five minutes. Delays and exchange coverage depend on the provider plan. No history, market cap, or volume is fabricated.${available.length < assets.length ? " Some tickers are temporarily unavailable." : ""}` };
+}
 export async function getMarkets(market: Market, request: typeof fetch = fetch): Promise<MarketData> {
-  if (market === "stocks") return demoData(market);
+  if (market === "stocks") return getStocks(request);
   try {
     if (market === "crypto") {
       const headers: Record<string, string> = {};
