@@ -1,13 +1,53 @@
 // Regression checks derived from the old route contract and malformed provider/math inputs.
 // These deliberately test acceptance boundaries, not a copy of the new implementation.
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { projectInvestment } from "../src/lib/model";
 import { getMarkets } from "../src/lib/markets";
 import { legacyRedirects } from "../src/lib/navigation";
+import { createHeroScene } from "../src/lib/hero-scene";
 
-afterEach(() => { vi.unstubAllEnvs(); });
+const gpu = vi.hoisted(() => ({
+  resources: [] as { name: string; dispose: ReturnType<typeof vi.fn> }[],
+  failEnvironment: false,
+  failRender: false,
+  renders: vi.fn(),
+}));
+vi.mock("three", () => {
+  function track(name: string) { const resource = { name, dispose: vi.fn() }; gpu.resources.push(resource); return resource; }
+  class Node {
+    position = { set: vi.fn(), y: 0 };
+    rotation = { set: vi.fn(), x: 0, y: 0, z: 0 };
+    add = vi.fn();
+  }
+  return {
+    WebGLRenderer: class {
+      dispose = track("renderer").dispose;
+      setPixelRatio = vi.fn(); setClearColor = vi.fn(); setSize = vi.fn();
+      render = () => { gpu.renders(); if (gpu.failRender) throw new Error("GPU render failed"); };
+    },
+    PMREMGenerator: class {
+      dispose = track("pmrem").dispose;
+      fromScene() { if (gpu.failEnvironment) throw new Error("Environment failed"); return { ...track("environment"), texture: {} }; }
+    },
+    Scene: Node,
+    Group: Node,
+    Mesh: Node,
+    HemisphereLight: Node,
+    DirectionalLight: Node,
+    PointLight: Node,
+    PerspectiveCamera: class extends Node { updateProjectionMatrix = vi.fn(); },
+    MeshPhysicalMaterial: class { dispose = track("material").dispose; },
+    MeshStandardMaterial: class { dispose = track("orbitMaterial").dispose; },
+    TorusKnotGeometry: class { dispose = track("geometry").dispose; },
+    TorusGeometry: class { dispose = track("orbitGeometry").dispose; },
+    SRGBColorSpace: "srgb", ACESFilmicToneMapping: 4,
+  };
+});
+vi.mock("three/addons/environments/RoomEnvironment.js", () => ({ RoomEnvironment: class { dispose = (() => { const resource = { name: "room", dispose: vi.fn() }; gpu.resources.push(resource); return resource.dispose; })(); } }));
+
+afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
 describe("legacy public route contract", () => {
   const originalRoutes = fileURLToPath(new URL("../../marketwise-original/src/routes/AppRoutes.jsx", import.meta.url));
@@ -59,5 +99,72 @@ describe("currency provider validation", () => {
     expect(data.mode).toBe("live");
     expect(data.asOf).toBe("2024-02-29T00:00:00Z");
     expect(data.quotes[0]).toMatchObject({ history: [], change: null, volume: null });
+  });
+});
+
+describe("hero resource lifecycle", () => {
+  let frames: Map<number, FrameRequestCallback>;
+  let id: number;
+  let canvas: HTMLCanvasElement;
+  let documentStub: EventTarget & { hidden: boolean };
+  let intersection: IntersectionObserverCallback;
+  let disconnects: ReturnType<typeof vi.fn>[];
+  beforeEach(() => {
+    gpu.resources.length = 0; gpu.failEnvironment = false; gpu.failRender = false; gpu.renders.mockClear();
+    frames = new Map(); id = 0; disconnects = [];
+    const hero = Object.assign(new EventTarget(), { getBoundingClientRect: () => ({ left: 0, top: 0, width: 800, height: 600 }) });
+    const parent = { closest: () => hero, clientWidth: 800, clientHeight: 600 };
+    canvas = Object.assign(new EventTarget(), { parentElement: parent }) as unknown as HTMLCanvasElement;
+    documentStub = Object.assign(new EventTarget(), { hidden: false });
+    vi.stubGlobal("window", { devicePixelRatio: 2 });
+    vi.stubGlobal("document", documentStub);
+    vi.stubGlobal("performance", { now: () => 0 });
+    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => { frames.set(++id, callback); return id; });
+    vi.stubGlobal("cancelAnimationFrame", (frame: number) => { frames.delete(frame); });
+    vi.stubGlobal("IntersectionObserver", class {
+      disconnect = vi.fn(); observe = vi.fn();
+      constructor(callback: IntersectionObserverCallback) { intersection = callback; disconnects.push(this.disconnect); }
+    });
+    vi.stubGlobal("ResizeObserver", class {
+      disconnect = vi.fn(); observe = vi.fn();
+      constructor() { disconnects.push(this.disconnect); }
+    });
+  });
+  function step(time: number) { const next = frames.entries().next().value; if (!next) return; const [frame, callback] = next; frames.delete(frame); callback(time); }
+  it("disposes partially allocated resources when environment generation fails", () => {
+    gpu.failEnvironment = true;
+    expect(() => createHeroScene(canvas, vi.fn(), vi.fn())).toThrow("Environment failed");
+    expect(gpu.resources.map(r => r.name)).toEqual(["renderer", "pmrem", "room"]);
+    for (const resource of gpu.resources) expect(resource.dispose, resource.name).toHaveBeenCalledTimes(1);
+  });
+  it("releases listeners, observers, queued frames and GPU objects exactly once", () => {
+    const scene = createHeroScene(canvas, vi.fn(), vi.fn());
+    expect(frames.size).toBe(1);
+    scene.dispose(); scene.dispose();
+    expect(frames.size).toBe(0);
+    disconnects.forEach(disconnect => expect(disconnect).toHaveBeenCalledOnce());
+    gpu.resources.forEach(resource => expect(resource.dispose, resource.name).toHaveBeenCalledOnce());
+    documentStub.dispatchEvent(new Event("visibilitychange"));
+    expect(frames.size).toBe(0);
+  });
+  it("suspends offscreen and paused work without duplicating the render loop", () => {
+    const first = vi.fn();
+    const scene = createHeroScene(canvas, first, vi.fn());
+    step(100); step(200);
+    expect(first).toHaveBeenCalledOnce();
+    scene.setPaused(true); expect(frames.size).toBe(0);
+    scene.setPaused(false); expect(frames.size).toBe(1);
+    intersection([{ isIntersecting: false } as IntersectionObserverEntry], {} as IntersectionObserver);
+    expect(frames.size).toBe(0);
+    intersection([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver);
+    expect(frames.size).toBe(1);
+    scene.dispose();
+  });
+  it("stops and signals the static fallback when a render fails", () => {
+    const failure = vi.fn(), scene = createHeroScene(canvas, vi.fn(), failure);
+    gpu.failRender = true; step(100);
+    expect(failure).toHaveBeenCalledOnce(); expect(frames.size).toBe(0);
+    gpu.resources.forEach(resource => expect(resource.dispose, resource.name).toHaveBeenCalledOnce());
+    scene.dispose();
   });
 });
