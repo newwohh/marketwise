@@ -25,6 +25,9 @@ old application are copied into this project.
   See `FEATURE_PARITY.md` for the complete audit and remaining gaps.
 - Original learning articles, SEO metadata, robots, sitemap, health endpoint,
   security headers, CI, and weekly dependency-update proposals.
+- 36 focused checks pass. The release also passed 31 hosted HTTP checks; actual
+  browser acceptance of motion, speech, notebook edits and embedded charts is
+  still pending.
 
 ## Incomplete — do not call this production-ready
 

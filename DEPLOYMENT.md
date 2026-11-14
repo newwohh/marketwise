@@ -2,19 +2,28 @@
 
 - Vercel team: `team_J7WTg0FG3OVZYzLSXIS0xThI`
 - Project: `prj_iDE7V9G3hHdJKsfmbHVy4n3W2TxY` (`marketwise`)
-- Deployment: `dpl_FLjT78aHNSmDL6aEgfq3a23rFMYW`
-- Source revision: `293be70`
+- Deployment: `dpl_3gt8xJqUPPjYEvWUBRrUdQn9jyGC`
+- Source revision: `1ed54be6d552abe99b204a554611718660f31b0d`
 - Framework/runtime: Next.js / Node.js 24
 - Vercel target/status: production / READY
 - Stable alias: https://marketwise-virid.vercel.app
 - Custom domain: https://marketwise.bynevin.dev
-- Exact deployment: https://marketwise-oeo8rkkqe-hellonevo13-4090s-projects.vercel.app
+- Exact deployment: https://marketwise-nos0t522w-hellonevo13-4090s-projects.vercel.app
 
 Deployment protection remains enabled for Vercel hostnames. The account owner
 can sign in to view them. This is a review build with account and billing flows
 still incomplete. Do not treat a READY build as proof of complete product flows.
 
 ## Verified HTTP behaviour
+
+The 3D-hero/public-feature release passed all 31 hosted route, redirect and API
+checks. See `verification/public-http.json`. Homepage HTML includes the new hero
+canvas and lazy-loaded client component. The live news page returned 16
+publisher headlines. Vercel reported no runtime error clusters in the recent
+15-minute scan. No log drains are configured. These checks do not establish
+WebGL rendering, speech, notebook editing, or TradingView browser interactions.
+
+Prior-release checks:
 
 Authenticated Vercel fetches returned HTTP 200 for `/`, `/api/health`, and
 `/api/markets?market=forex`. The forex endpoint returned provider data from
@@ -52,3 +61,8 @@ The Vercel account's installed integration list is empty. Authentication and
 subscription services must be provisioned before their flows can be completed.
 The deployment currently has no working account, checkout, billing portal,
 cloud-watchlist, or Pro export endpoint. No real customer payments are enabled.
+
+## Feature audit
+
+See `FEATURE_PARITY.md` for the original-route comparison. Public routes and
+tools have been restored, but account and billing parity is not complete.
