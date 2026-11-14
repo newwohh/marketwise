@@ -34,8 +34,9 @@ production-target deployment are READY. The homepage, health endpoint, and daily
 forex endpoint returned HTTP 200 through authenticated deployment access. This
 is an incomplete review build, not a completed production-ready product.
 See `DEPLOYMENT.md` for the verified deployment and DNS configuration. GitHub writes were also denied earlier in this session; there is no
-new remote repository or pull request for this rebuild yet. Cloudflare DNS has
-not been changed. The browser automation environment is unavailable, so visual
+new remote repository or pull request for this rebuild yet. The user configured
+Cloudflare DNS; `https://marketwise.bynevin.dev` now serves the homepage and
+health endpoint over verified HTTPS with HTTP 200. The browser automation environment is unavailable, so visual
 and interactive browser QA is still outstanding.
 
 ## Local development

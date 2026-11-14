@@ -7,6 +7,7 @@
 - Framework/runtime: Next.js / Node.js 24
 - Vercel target/status: production / READY
 - Stable alias: https://marketwise-virid.vercel.app
+- Custom domain: https://marketwise.bynevin.dev
 - Exact deployment: https://marketwise-oeo8rkkqe-hellonevo13-4090s-projects.vercel.app
 
 Deployment protection remains enabled for Vercel hostnames. The account owner
@@ -23,7 +24,11 @@ Visual browser QA remains blocked by the unavailable browser environment.
 ## Custom domain
 
 `marketwise.bynevin.dev` is attached to the project and Vercel reports ownership
-verified. Its DNS configuration is still missing. The authoritative nameservers
+verified. The user configured its Cloudflare CNAME and disabled proxying. Public
+DNS resolves to the recommended CNAME below; Vercel reports `misconfigured: false`.
+HTTPS requests with certificate verification returned HTTP 200 for both `/`
+(confirmed Marketwise homepage) and `/api/health` (confirmed service status `ok`).
+The authoritative nameservers
 are Cloudflare's `aiden.ns.cloudflare.com` and `jocelyn.ns.cloudflare.com`.
 
 Vercel's recommended record for this exact project/domain is:
@@ -36,10 +41,10 @@ Vercel's recommended record for this exact project/domain is:
 | Proxy | DNS only |
 | TTL | Auto |
 
-No Cloudflare write access is connected. Add only this subdomain record; keep
-apex, mail, and unrelated DNS records intact. Recheck Vercel DNS configuration
-and HTTPS after propagation. Vercel ownership verification alone does not
-confirm that the hostname resolves or that TLS is ready.
+No Cloudflare write access is connected; the user saved the DNS change manually.
+Keep this subdomain DNS-only. Cloudflare proxying initially produced HTTP 525;
+after it was disabled, DNS and HTTPS checks succeeded. No changes to the apex,
+mail, or unrelated DNS records were requested.
 
 ## Remaining service provisioning
 
