@@ -20,9 +20,11 @@ export function projectInvestment(initial: number, monthly: number, years: numbe
   const points = [initial];
   for (let month = 1; month <= years * 12; month++) {
     value = value * (1 + rate) + monthly;
+    if (!Number.isFinite(value)) throw new Error("These amounts exceed the simulator’s supported range. Use smaller values.");
     if (month % 12 === 0) points.push(value);
   }
   const contributed = initial + monthly * years * 12;
+  if (!Number.isFinite(contributed)) throw new Error("These contributions exceed the simulator’s supported range. Use smaller values.");
   return { value, contributed, gain: value - contributed, points };
 }
 export function hasPro(subscription: { status: string; current_period_end: string | null } | null, now = Date.now()) {

@@ -4,6 +4,10 @@ import type { Market, MarketData } from "./model";
 import { demoData } from "./demo";
 const coin = z.object({ id: z.string(), symbol: z.string(), name: z.string(), current_price: z.number().nonnegative(), price_change_percentage_24h: z.number().nullable(), price_change_percentage_7d_in_currency: z.number().nullable().optional(), market_cap: z.number().nullable(), total_volume: z.number().nullable(), last_updated: z.string().datetime(), sparkline_in_7d: z.object({ price: z.array(z.number().nonnegative()) }).optional() });
 const colors = ["#f3a64a", "#b7a6ed", "#a2f2e3", "#e5d17b", "#aeb8c3", "#d3b887"];
+const calendarDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(value => {
+  const date = new Date(`${value}T00:00:00Z`);
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+});
 export async function getMarkets(market: Market, request: typeof fetch = fetch): Promise<MarketData> {
   if (market === "stocks") return demoData(market);
   try {
@@ -17,7 +21,7 @@ export async function getMarkets(market: Market, request: typeof fetch = fetch):
     }
     const response = await request("https://api.frankfurter.dev/v1/latest?base=USD&symbols=EUR,GBP,INR,JPY,AUD,CAD,CHF", { next: { revalidate: 3600 }, signal: AbortSignal.timeout(8000) });
     if (!response.ok) throw new Error("Provider unavailable");
-    const result = z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), rates: z.record(z.string(), z.number().positive()) }).parse(await response.json());
+    const result = z.object({ date: calendarDate, rates: z.record(z.string().regex(/^[A-Z]{3}$/), z.number().positive()).refine(rates => Object.keys(rates).length > 0) }).parse(await response.json());
     const names: Record<string, string> = { EUR: "Euro", GBP: "British pound", INR: "Indian rupee", JPY: "Japanese yen", AUD: "Australian dollar", CAD: "Canadian dollar", CHF: "Swiss franc" };
     return { quotes: Object.entries(result.rates).map(([symbol, price], i) => ({ id: symbol.toLowerCase(), symbol: `USD/${symbol}`, name: names[symbol] ?? symbol, price, change: null, marketCap: null, volume: null, history: [], color: colors[i % colors.length] })), mode: "live", source: "Frankfurter / ECB", asOf: `${result.date}T00:00:00Z`, note: "Daily reference exchange rates per US dollar. No intraday changes or history are supplied." };
   } catch { return demoData(market); }
