@@ -31,5 +31,5 @@ export function hasPro(subscription: { status: string; current_period_end: strin
   return !!subscription && ["active", "trialing"].includes(subscription.status) && !!subscription.current_period_end && Date.parse(subscription.current_period_end) > now;
 }
 export function safeNext(next: string | null) {
-  return next && /^\/(?!\/|\\)/.test(next) && !/[\\\r\n]/.test(next) ? next : "/account";
+  return next && /^\/(?!\/|\\)/.test(next) && !/[\u0000-\u0020\u007f\\]/.test(next) ? next : "/account";
 }

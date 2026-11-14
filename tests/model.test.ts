@@ -33,6 +33,6 @@ describe("subscription entitlement", () => {
   });
 });
 describe("redirect target", () => {
-  it.each(["https://evil.example", "//evil.example", "/\\evil.example", "/x\r\nLocation: evil", null])("rejects external or ambiguous target %j", target => expect(safeNext(target)).toBe("/account"));
+  it.each(["https://evil.example", "//evil.example", "/\\evil.example", "/\t/evil.example", "/\u0000/evil.example", "/x\r\nLocation: evil", null])("rejects external or ambiguous target %j", target => expect(safeNext(target)).toBe("/account"));
   it("allows a local page", () => expect(safeNext("/account/password")).toBe("/account/password"));
 });
