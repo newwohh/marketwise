@@ -1,0 +1,49 @@
+# Deployment record
+
+- Vercel team: `team_J7WTg0FG3OVZYzLSXIS0xThI`
+- Project: `prj_iDE7V9G3hHdJKsfmbHVy4n3W2TxY` (`marketwise`)
+- Deployment: `dpl_FLjT78aHNSmDL6aEgfq3a23rFMYW`
+- Source revision: `293be70`
+- Framework/runtime: Next.js / Node.js 24
+- Vercel target/status: production / READY
+- Stable alias: https://marketwise-virid.vercel.app
+- Exact deployment: https://marketwise-oeo8rkkqe-hellonevo13-4090s-projects.vercel.app
+
+Deployment protection remains enabled for Vercel hostnames. The account owner
+can sign in to view them. This is a review build with account and billing flows
+still incomplete. Do not treat a READY build as proof of complete product flows.
+
+## Verified HTTP behaviour
+
+Authenticated Vercel fetches returned HTTP 200 for `/`, `/api/health`, and
+`/api/markets?market=forex`. The forex endpoint returned provider data from
+Frankfurter / ECB dated 2026-11-13 with no fabricated history or daily changes.
+Visual browser QA remains blocked by the unavailable browser environment.
+
+## Custom domain
+
+`marketwise.bynevin.dev` is attached to the project and Vercel reports ownership
+verified. Its DNS configuration is still missing. The authoritative nameservers
+are Cloudflare's `aiden.ns.cloudflare.com` and `jocelyn.ns.cloudflare.com`.
+
+Vercel's recommended record for this exact project/domain is:
+
+| Field | Value |
+| --- | --- |
+| Type | CNAME |
+| Name (in the bynevin.dev zone) | marketwise |
+| Target | bb35a45b288b0bc0.vercel-dns-017.com. |
+| Proxy | DNS only |
+| TTL | Auto |
+
+No Cloudflare write access is connected. Add only this subdomain record; keep
+apex, mail, and unrelated DNS records intact. Recheck Vercel DNS configuration
+and HTTPS after propagation. Vercel ownership verification alone does not
+confirm that the hostname resolves or that TLS is ready.
+
+## Remaining service provisioning
+
+The Vercel account's installed integration list is empty. Authentication and
+subscription services must be provisioned before their flows can be completed.
+The deployment currently has no working account, checkout, billing portal,
+cloud-watchlist, or Pro export endpoint. No real customer payments are enabled.

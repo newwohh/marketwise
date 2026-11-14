@@ -29,9 +29,11 @@ export action are reserved for this next phase; they are not acceptance-tested
 features. The public marketing copy describes the intended complete product.
 Do not release this branch as a completed product until those flows are ready.
 
-Vercel recognizes the connected user, but project-scope access returned HTTP 403.
-Its account-authorization step must be completed before project creation or
-deployment. GitHub writes were also denied earlier in this session; there is no
+Vercel project access is now authorized. The `marketwise` project and its first
+production-target deployment are READY. The homepage, health endpoint, and daily
+forex endpoint returned HTTP 200 through authenticated deployment access. This
+is an incomplete review build, not a completed production-ready product.
+See `DEPLOYMENT.md` for the verified deployment and DNS configuration. GitHub writes were also denied earlier in this session; there is no
 new remote repository or pull request for this rebuild yet. Cloudflare DNS has
 not been changed. The browser automation environment is unavailable, so visual
 and interactive browser QA is still outstanding.
@@ -66,8 +68,8 @@ predicate tests do **not** verify a real billing integration.
 
 ## Release plan
 
-1. Grant the Vercel connection access to the intended account scope. Create a new
-   project named `marketwise`; preserve the old repository and deployment.
+1. Vercel access and new `marketwise` project creation are complete. The old
+   repository and deployment remain separate.
 2. Provision actual authentication and subscription services. Vercel recommends
    Clerk for authentication and Stripe for SaaS subscriptions. Install and read
    their integration guidance before implementing against real configuration.
