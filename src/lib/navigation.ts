@@ -6,6 +6,8 @@ export const legacyRedirects = [
   { source: "/login", destination: "/account", permanent: true },
   { source: "/sign-up", destination: "/account", permanent: true },
   { source: "/subscription", destination: "/pricing", permanent: true },
+  { source: "/user_protecttion", destination: "/user_protection", permanent: true },
+  { source: "/cryptocurrency/chart", destination: "/cryptocurrency/chart/BTC", permanent: true },
 ];
 export const productLinks = [
   { href: "/cryptocurrency", title: "Cryptocurrency", text: "Prices, seven-day trends, and your watchlist.", icon: "↗" },
