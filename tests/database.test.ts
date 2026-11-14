@@ -201,3 +201,42 @@ describe("atomic capped watchlist RPC", () => {
     expect((await db.query("select * from public.watchlists")).rows).toEqual([]);
   });
 });
+
+// The provider-facing route tests use controlled Stripe calls; these assertions
+// independently exercise the real checkout lease functions and role privileges.
+describe("actual checkout lease coordination", () => {
+  const tokenA = "20000000-0000-0000-0000-000000000001";
+  const tokenB = "20000000-0000-0000-0000-000000000002";
+  async function lease(action: "acquire" | "renew" | "release", user = ALICE, token = tokenA) {
+    return asRole("service_role", null, async tx => (await tx.query<{ result: boolean }>(`select public.${action}_billing_checkout($1::uuid,$2::uuid) as result`, [user, token])).rows[0].result);
+  }
+  it("denies browser roles both direct lease access and privileged lock operations", async () => {
+    for (const role of ["anon", "authenticated"] as const) {
+      await expect(asRole(role, ALICE, tx => tx.query("select * from public.checkout_leases"))).rejects.toMatchObject({ code: "42501" });
+      for (const action of ["acquire", "renew", "release"]) await expect(asRole(role, ALICE, tx => tx.query(`select public.${action}_billing_checkout($1::uuid,$2::uuid)`, [ALICE, tokenA]))).rejects.toMatchObject({ code: "42501" });
+    }
+  });
+  it("admits one request and allows only its current token to renew or release", async () => {
+    expect(await lease("acquire")).toBe(true);
+    expect(await lease("acquire", ALICE, tokenB)).toBe(false);
+    expect(await lease("renew", ALICE, tokenB)).toBe(false);
+    expect(await lease("release", ALICE, tokenB)).toBe(false);
+    expect(await lease("renew")).toBe(true);
+    expect(await lease("release")).toBe(true);
+    expect(await lease("acquire", ALICE, tokenB)).toBe(true);
+  });
+  it("replaces an expired lease without letting the old process release its replacement", async () => {
+    expect(await lease("acquire")).toBe(true);
+    await db.query("update public.checkout_leases set expires_at=now()-interval '1 second' where user_id=$1", [ALICE]);
+    expect(await lease("renew")).toBe(false);
+    expect(await lease("acquire", ALICE, tokenB)).toBe(true);
+    expect(await lease("release", ALICE, tokenA)).toBe(false);
+    expect(await lease("renew", ALICE, tokenB)).toBe(true);
+  });
+  it("coordinates one account without locking another account", async () => {
+    expect(await lease("acquire", ALICE, tokenA)).toBe(true);
+    expect(await lease("acquire", BOB, tokenB)).toBe(true);
+    expect(await lease("release", ALICE, tokenB)).toBe(false);
+    expect(await lease("release", BOB, tokenB)).toBe(true);
+  });
+});
