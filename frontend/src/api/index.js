@@ -143,7 +143,7 @@ export const postNewUser = async (userDetails) => {
 const initPayment = async (data) => {
   console.log(window);
   const options = {
-    key: "REDACTED_CONFIGURE_LOCALLY",
+    key: import.meta.env.VITE_RAZORPAY_KEY_ID,
     amount: data.amount,
     currency: data.currency,
     name: data.name,
