@@ -1,0 +1,10 @@
+import Link from "next/link";
+import { Check } from "lucide-react";
+import { BillingCheckout } from "@/components/billing-panel";
+import { publicBillingPlans } from "@/lib/billing";
+export const metadata = { title: "Plans" };
+export const dynamic = "force-dynamic";
+export default async function PricingPage() {
+  const plans = await publicBillingPlans().catch(() => []);
+  return <div className="section-pad pricing-page"><div className="section-kicker"><span className="eyebrow">A CLEARER STARTING POINT</span><span className="mono">{plans.length ? "SECURE CHECKOUT BY STRIPE" : "PAID PLANS AWAIT CONFIGURATION"}</span></div><div className="page-heading"><div><h1>Start with <em>perspective.</em></h1><p>Useful public tools. A personal workspace. Pro when you need exports.</p></div></div><div className="pricing-grid"><section className="price-card"><span className="eyebrow">AVAILABLE NOW</span><h2>Public workspace</h2><div className="price">Free</div><p>No payment required.</p><ul>{["Crypto and currency overview", "Watchlists and heatmaps", "TradingView technical chart pages", "Investment simulator", "Academy and research notebook"].map(s => <li key={s}><Check size={15} />{s}</li>)}</ul><Link href="/markets" className="button small">Explore the workspace ↗</Link></section><section className="price-card featured"><span className="eyebrow">MARKETWISE PRO</span><h2>A closer perspective.</h2><p>Account features include your cloud watchlist, profile, and publishing. Pro adds downloadable market-data CSV exports.</p><ul>{["Crypto, stock, and currency exports", "Quote sources and timestamps included", "Stripe-hosted subscription management", "Cancellation at the end of your billing period"].map(s => <li key={s}><Check size={15} />{s}</li>)}</ul><BillingCheckout plans={plans} /></section></div><p className="pricing-note">Subscriptions renew at the interval shown. Manage your payment details and cancellation from your account. Previous Marketwise subscriptions require migration before they appear here.</p></div>;
+}
