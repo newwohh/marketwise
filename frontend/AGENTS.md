@@ -1,33 +1,33 @@
-# Repository guide
+# Marketwise repository guide
 
-MarketWise is a React 19 frontend for cryptocurrency, stock, and forex tracking, built with Vite, React Router 7, Redux Toolkit, and Material UI 5.
-
-Use Node.js 20.19+ (20.x) or 22.12+; prefer a supported LTS release.
+This branch is the independent Next.js/TypeScript rebuild of the original React
+frontend. Preserve its North-inspired charcoal/lilac design and original 3D hero.
 
 ## Commands
 
-- Install locked dependencies: `npm ci`.
-- Start locally: `npm start` (http://localhost:3000).
-- Check production compilation: `npm run build`.
-- Run tests without watch mode: `npm test`.
-- Tests in `tests/` use the Node.js built-in test runner; add focused regression checks for behavioral changes.
+- Node.js 24 LTS; install with `npm ci`.
+- Develop: `npm run dev`.
+- Verify: `npm test`, `npm run build`, `npm run typecheck`.
+- Never commit `.env.local`, `.next`, `node_modules`, provider credentials, or
+  generated payment/customer data.
 
-## Code map
+## Feature ownership and contracts
 
-- `src/index.jsx`: React entry point, router, and Redux provider.
-- `src/routes/AppRoutes.jsx`: routes and user context provider.
-- `src/pages/`: route-level screens; `src/components/`: feature components.
-- `src/store/store.js` and `src/store/store-actions.js`: active Redux store and state logic.
-- `src/api/index.js`: shared backend requests; some requests also live in components.
-- `src/constants/constants.js`: backend URL and shared constants.
-- `src/styles/`: theme and feature styling; `src/assets/`: bundled images.
+- `src/lib/markets.ts`: fixed upstream provider adapters and explicit demo fallbacks.
+- `src/lib/model.ts`: validated financial calculations and quote contracts.
+- `src/lib/hero-scene.ts`: GPU resource lifecycle; keep reduced-motion fallback.
+- `src/lib/auth.ts`, Supabase helpers and `src/app/auth/`: validated account identity.
+- Account identity must come from server-validated authentication, never a client user ID.
+- Content/watchlist APIs must enforce ownership and keep database RLS enabled.
+- Billing must validate signatures, configured price IDs and subscription period;
+  a checkout redirect or browser flag is never proof of payment.
+- `supabase/migrations/`: review and apply to the intended project before using accounts.
+- `FEATURE_PARITY.md` records the legacy route/feature comparison. Keep it accurate.
 
-## Working conventions
+## Verification and deployment
 
-- Follow existing JavaScript/JSX, functional component, and styling patterns. Reuse existing components and dependencies; keep changes focused.
-- Trace callers before changing shared API or state behavior.
-- The backend defaults to `http://127.0.0.1:5050/` and is a separate service. A successful frontend build does not validate authentication, payments, or live market data.
-- Keep secrets out of frontend source and committed environment files; browser bundles expose their configuration.
-- Preserve `package-lock.json`; change dependencies only when the task needs it.
-- For source changes, run the build and relevant tests; report existing warnings or external-service blockers accurately.
-- Do not commit generated `build/` output or `node_modules/`.
+Use focused regression tests for behaviour changes. Public HTTP checks do not
+establish browser WebGL, speech, authentication, payment or database behaviour.
+Report configure-later providers separately from features verified end to end.
+Use atomic commits grouped by feature and retain legacy routes/history. Do not
+overwrite the original default branch or force-push shared branches.

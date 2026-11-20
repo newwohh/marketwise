@@ -1,63 +1,70 @@
-# MarketWise
+# Marketwise
 
-MarketWise is a React app that allows you to track the prices of cryptocurrencies, forex, and stocks. It provides real-time data and charts, so you can stay up-to-date on the latest market movements.
+Market research, investment scenarios, watchlists and field notes in a
+North-inspired charcoal/lilac workspace with an original animated 3D hero.
 
-To use MarketWise, simply enter the symbols of the assets you want to track. The app will then display a live chart of the prices. You can also view historical data, news, and analysis for each asset.
+- Website: https://marketwise.bynevin.dev
+- Repository: https://github.com/newwohh/marketwise-frontend
+- Rebuild: `rebuild/marketwise-production` — PR #1 preserves the legacy history.
 
-MarketWise is a powerful tool for anyone who wants to stay ahead of the market. It is easy to use and provides a wealth of information.
+## Features
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- Crypto and currency data with source validation and explicit fallback labels.
+- Configurable Finnhub stock quotes, exchange reference directory, and dividend
+  announcements; TradingView technical charts and crypto/stock heatmaps.
+- Amount/asset-unit investment simulation with monthly contributions, zero and
+  negative returns, and bounded finite results.
+- Browser watchlists plus account sync retaining the newest 100 assets atomically.
+- Local research drafts plus account-owned drafts and public publishing, editing,
+  unpublishing and deletion; public field-note pages and pagination.
+- Supabase registration, sign-in/out, confirmation, recovery and profile editing.
+- Stripe subscription checkout, billing portal, signed/replayed-event handling,
+  checkout coordination and current-subscription checks for paid CSV exports.
+- Academy read-aloud, original-source news, guided help and floating launcher.
+- Legacy URLs, accessible navigation, local fonts, responsive design, SEO, CI and
+  dependency update proposals.
 
-### Features
+## Configure later
 
-Real-time data and charts for cryptocurrencies, forex, and stocks
-Historical data, news, and analysis for each asset,
-Customizable charts,
-Alerts for price changes,
-Heatmap,
-Blogs,
-Invest Simulator,
-Ticker Subscription,
-Premium,
-Short Guide,
-Chat Support
+See [SETUP.md](SETUP.md) for exact provider/environment steps and migrations.
+Public research tools run without account/payment keys. Connected features
+fail clearly until configured; no fake account, success or payment is created.
 
-## Getting started
+Apply all `supabase/migrations/*.sql` in order, configure Supabase email delivery
+and callbacks, add Stripe test keys/prices/webhook/portal, and redeploy after
+changing public build-time variables. Optional market keys are server-only.
 
-Use Node.js 20.19+ (20.x) or 22.12+; a supported LTS release is recommended.
+Implementation is not a claim that live accounts/payments have been verified.
+Old user/content records and password hashes have not been imported. Live
+provider acceptance and browser interaction still need the checks in SETUP.md.
+
+## Develop and verify
+
+Use Node.js 24 LTS:
 
 ```sh
 npm ci
-npm start
+npm run dev
+# http://localhost:3000
+
+npm test
+npm run build
+npm run typecheck
 ```
 
-Open http://localhost:3000. The separate backend is expected at
-http://127.0.0.1:5050/ (`src/constants/constants.js`).
+Tests exercise validation, ownership boundaries, SDK request contracts, real
+Stripe signatures, GPU cleanup and the actual SQL migrations under PostgreSQL
+/PGlite. Database tests supply only the provider's auth runtime fixture; tracked
+RLS policies and RPC functions are executed unchanged.
 
-```sh
-npm run build    # production files in build/
-npm run preview  # preview the production build
-npm test         # Node.js regression tests
-npm audit        # check all dependencies, including development tools
-```
+## Migration evidence
 
-The frontend uses Vite. Configure production hosting to serve `index.html`
-for client-side routes. API-dependent features require the backend and
-working third-party API access.
+- [FEATURE_PARITY.md](FEATURE_PARITY.md): routes and feature status.
+- [HISTORY_AUDIT.md](HISTORY_AUDIT.md): trace through 87 legacy commits.
+- [QA_REPORT.md](QA_REPORT.md): calculation/data/motion findings.
+- [BROWSER_QA.md](BROWSER_QA.md): exact unavailable-browser limitation.
+- [CONTENT_SETUP.md](CONTENT_SETUP.md) and [BILLING_SETUP.md](BILLING_SETUP.md).
+- [DEPLOYMENT.md](DEPLOYMENT.md): recorded deployment/DNS verification.
 
-## Dependency maintenance
-
-The September 2026 update moves to React/React DOM 19.3, React Router 7,
-Redux Toolkit 2, and Vite 8. Swiper replaces the React 18-only carousel;
-the hero text uses a CSS animation. Unused dependencies were removed.
-
-The full npm audit went from 82 findings (6 critical, 36 high, 24 moderate,
-16 low) to zero, including development dependencies. Run `npm audit` again
-as new advisories are published. MUI remains on 5.18 and the speech component
-on 0.4.5 to preserve their current APIs; these are not their latest majors.
-The retained MUI/storage dependencies still emit deprecation notices.
-
-Build and regression tests pass. Browser checks cover FAQ interaction,
-the education page, and carousels with mocked market responses; they do not
-validate live backend services or third-party credentials.
+Private project. The visual reference informs the direction; North's logos,
+proprietary fonts, copy and customer claims are not reproduced.

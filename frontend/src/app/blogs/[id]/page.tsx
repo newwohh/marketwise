@@ -1,0 +1,6 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { publicPost } from "@/lib/posts-data";
+export const dynamic = "force-dynamic";
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) { const { id } = await params; const post = await publicPost(id); return { title: post?.title ?? "Field note" }; }
+export default async function PublicPostPage({ params }: { params: Promise<{ id: string }> }) { const { id } = await params; const post = await publicPost(id); if (!post) notFound(); return <article className="article-page section-pad"><Link href="/blogs" className="text-link">← All field notes</Link><span className="eyebrow">COMMUNITY FIELD NOTE</span><h1>{post.title}</h1><p className="provider-caption">By {post.author_name} · {new Date(post.updated_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "Asia/Kolkata" })}</p><div style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere", lineHeight: 1.85, margin: "35px 0", color: "var(--muted)" }}>{post.body}</div><p className="provider-caption">A contributor’s perspective, not financial advice or a Marketwise recommendation.</p></article>; }

@@ -1,0 +1,164 @@
+[
+  {
+    "path": "/",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/markets",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/cryptocurrency",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/stocks",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/forex",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/heatmap/cryptocurrency",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/heatmap/stocks",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/cryptocurrency/chart/BTC",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/cryptocurrency/chart/btc-bitcoin",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/chat",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/about",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/user_protection",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/faq",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/blogs",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/learn",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/learn/technical-analysis",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/grow",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/explore",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/news",
+    "status": 200,
+    "ok": true,
+    "publisher_headlines": 16
+  },
+  {
+    "path": "/account",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/pricing",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/simulator",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/api/health",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "path": "/api/export",
+    "status": 503,
+    "ok": true
+  },
+  {
+    "path": "/api/markets?market=unknown",
+    "status": 400,
+    "ok": true
+  },
+  {
+    "path": "/education",
+    "status": 308,
+    "ok": true,
+    "location": "/learn"
+  },
+  {
+    "path": "/investsimulator",
+    "status": 308,
+    "ok": true,
+    "location": "/simulator"
+  },
+  {
+    "path": "/profile",
+    "status": 308,
+    "ok": true,
+    "location": "/account"
+  },
+  {
+    "path": "/login",
+    "status": 308,
+    "ok": true,
+    "location": "/account"
+  },
+  {
+    "path": "/sign-up",
+    "status": 308,
+    "ok": true,
+    "location": "/account"
+  },
+  {
+    "path": "/subscription",
+    "status": 308,
+    "ok": true,
+    "location": "/pricing"
+  }
+]
